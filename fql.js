@@ -29,22 +29,28 @@ FQL.prototype.exec = function () {
 FQL.prototype.where = function (filters) {
 	results = [ ];
 	for (var i=0, len= this.table.length; i<len; i++) {
+		var isMatch = true;
 		for (atr in filters) {
-			if (this.table[i].hasOwnProperty(atr)) {
-				if (this.table[i][atr]!=filters[atr]) {
-					continue;
-					continue; //break out of both loops; not a match
-				}
+			if (typeof filters[atr] === "function") {
+				if (!filters[atr](this.table[i][atr]))
+					isMatch=false;
 			}
-		}
+			else if (this.table[i][atr] !== filters[atr]) {
+				isMatch = false;
+			}
 		//did not continue so it matches every attribute
-		results.push(this.table[i]);
+		}
+		if (isMatch) {
+			console.log(this.table[i]);
+			results.push(this.table[i]);
+		}
 	}
-	return results;
+	
+	return new FQL(results);
 };
 
 FQL.prototype.count = function () {
-	return this.table.length;
+	return this.exec().length;
 };
 
 FQL.prototype.limit = function (amount) {
@@ -54,7 +60,6 @@ FQL.prototype.limit = function (amount) {
 			return tmp; //don't go past the length of the table
 		tmp.push(this.table[i]);
 	}
-	console.log(tmp);
 	return new FQL(tmp);
 };
 
