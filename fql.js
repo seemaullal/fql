@@ -41,7 +41,6 @@ FQL.prototype.where = function (filters) {
 		//did not continue so it matches every attribute
 		}
 		if (isMatch) {
-			console.log(this.table[i]);
 			results.push(this.table[i]);
 		}
 	}
@@ -63,7 +62,27 @@ FQL.prototype.limit = function (amount) {
 	return new FQL(tmp);
 };
 
-FQL.prototype.select = function (columnNames) {};
+FQL.prototype.select = function (columnNames) {
+	// var result = [ ];
+	// for (var i = 0, len = this.length; i<len; i++) {
+	// 	var tmpObj = { };
+	// 	for (atr in columnNames) {
+	// 		if (obj1.hasOwnProperty(atr)) 
+	// 			tmpObj[atr] = this.table[i][atr];
+	// 	}
+	// 	result.push(tmpObj);
+	// }
+	// console.log(result);
+	// return new FQL(result);
+	var newTable = this.exec().map( function(row) {
+		var newRow = {};
+		columnNames.forEach(function (colName) {
+			newRow[colName] = row[colName];
+		});
+		return newRow;
+	});
+	return new FQL(newTable);
+};
 
 FQL.prototype.nimit = function () {};
 
