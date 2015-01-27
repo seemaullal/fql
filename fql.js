@@ -17,16 +17,46 @@ function merge(obj1, obj2) {
 }
 
 
-var FQL = function(table) {
+function FQL(table) {
+	this.table = table;
+
 };
 
-FQL.prototype.exec = function () {};
+FQL.prototype.exec = function () {
+	return this.table;
+};
 
-FQL.prototype.where = function (filters) {};
+FQL.prototype.where = function (filters) {
+	results = [ ];
+	for (var i=0, len= this.table.length; i<len; i++) {
+		for (atr in filters) {
+			if (this.table[i].hasOwnProperty(atr)) {
+				if (this.table[i][atr]!=filters[atr]) {
+					continue;
+					continue; //break out of both loops; not a match
+				}
+			}
+		}
+		//did not continue so it matches every attribute
+		results.push(this.table[i]);
+	}
+	return results;
+};
 
-FQL.prototype.count = function () {};
+FQL.prototype.count = function () {
+	return this.table.length;
+};
 
-FQL.prototype.limit = function (amount) {};
+FQL.prototype.limit = function (amount) {
+	var tmp = [ ];
+	for (var i=0; i<amount; i++) {
+		if (i=== this.table.length)
+			return tmp; //don't go past the length of the table
+		tmp.push(this.table[i]);
+	}
+	console.log(tmp);
+	return new FQL(tmp);
+};
 
 FQL.prototype.select = function (columnNames) {};
 
