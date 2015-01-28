@@ -28,23 +28,35 @@ FQL.prototype.exec = function () {
 };
 
 FQL.prototype.where = function (filters) {
-	results = [ ];
-	for (var i=0, len= this.table.length; i<len; i++) {
-		var isMatch = true;
-		for (atr in filters) {
-			if (typeof filters[atr] === "function") {
-				if (!filters[atr](this.table[i][atr]))
-					isMatch=false;
-			}
-			else if (this.table[i][atr] !== filters[atr]) {
-				isMatch = false;
-			}
-		//did not continue so it matches every attribute
+	var results = [ ];
+	if ( (Object.keys(filters).length ===1) && ( this.indexTable [Object.keys(filters)[0]] != undefined) ) {
+		for (key in filters) {
+			var col = key;
+			var val = filters[key];
 		}
-		if (isMatch) {
-			results.push(this.table[i]);
+		var indices = this.getIndex(col,val);
+		for (var i=0; i<indices.length; i++) {
+			results.push(this.table[indices[i]]);
 		}
 	}
+	else {
+		for (var i=0, len= this.table.length; i<len; i++) {
+			var isMatch = true;
+			for (atr in filters) {
+				if (typeof filters[atr] === "function") {
+					if (!filters[atr](this.table[i][atr]))
+						isMatch=false;
+				}
+				else if (this.table[i][atr] !== filters[atr]) {
+					isMatch = false;
+				}
+			//did not continue so it matches every attribute
+			}
+			if (isMatch) {
+				results.push(this.table[i]);
+			}
+		}
+		}
 	
 	return new FQL(results);
 };
