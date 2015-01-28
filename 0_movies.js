@@ -1,6 +1,4 @@
 
-  
- //datasets for FQL functions and tests
 var movies = [ { id: 10920, name: 'Aliens', year: 1986, rank: 8.2 },
   { id: 17173, name: 'Animal House', year: 1978, rank: 7.5 },
   { id: 18979, name: 'Apollo 13', year: 1995, rank: 7.5 },
