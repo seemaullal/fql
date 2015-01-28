@@ -63,30 +63,38 @@ FQL.prototype.limit = function (amount) {
 };
 
 FQL.prototype.select = function (columnNames) {
-	// var result = [ ];
-	// for (var i = 0, len = this.length; i<len; i++) {
-	// 	var tmpObj = { };
-	// 	for (atr in columnNames) {
-	// 		if (obj1.hasOwnProperty(atr)) 
-	// 			tmpObj[atr] = this.table[i][atr];
-	// 	}
-	// 	result.push(tmpObj);
-	// }
-	// console.log(result);
-	// return new FQL(result);
-	var newTable = this.exec().map( function(row) {
-		var newRow = {};
-		columnNames.forEach(function (colName) {
-			newRow[colName] = row[colName];
-		});
-		return newRow;
-	});
-	return new FQL(newTable);
+	var result = [ ];
+	for (var i = 0, len = this.table.length; i<len; i++) {
+		var tmpObj = { };
+		for (var j =0; j < columnNames.length; j++) {
+			if (this.table[i].hasOwnProperty(columnNames[j])) 
+				tmpObj[columnNames[j]] = this.table[i][columnNames[j]];
+		}
+		result.push(tmpObj);
+	}
+	//console.log(result);
+	return new FQL(result);
+
+
+	// var newTable = this.exec().map( function(row) {
+	// 	var newRow = {};
+	// 	columnNames.forEach(function (colName) {
+	// 		newRow[colName] = row[colName];
+	// 	});
+	// 	return newRow;
+	// });
+	// return new FQL(newTable);
 };
 
-FQL.prototype.nimit = function () {};
+FQL.prototype.order = function (columnName) {
+	var sortedTable = this.table.slice(); //shallow copy
+	sortedTable.sort(function(obj1,obj2) {
+		return obj1[columnName] - obj2[columnName];
+	});
 
-FQL.prototype.order = function (columnName) {};
+	return new FQL(sortedTable);
+
+};
 
 FQL.prototype.left_join = function (foriegnFql, rowMatcher) {};
 
