@@ -87,7 +87,7 @@ FQL.prototype.select = function (columnNames) {
 };
 
 FQL.prototype.order = function (columnName) {
-	var sortedTable = this.table.slice(); //shallow copy
+	var sortedTable = this.exec().slice(); //shallow copy
 	sortedTable.sort(function(obj1,obj2) {
 		return obj1[columnName] - obj2[columnName];
 	});
