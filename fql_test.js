@@ -284,12 +284,14 @@ describe('Functional Query Language - Indexing', function () {
    * are many indices with gender 'M'. So make sure to store the 
    * indices as an array of numbers.
    */
+
   it('should support a function to add an index to the FQL class', function() {
     // it should not be possible to look up the index of an entry
     // in a row prior to `addIndex` on that row
-    expect( moviesTable.getIndicesOf('name', 'Apollo 13') ).toEqual( undefined );
+    expect( moviesTable.getIndex('name', 'Apollo 13') ).toEqual( undefined );
     moviesTable.addIndex('name');
-    expect( moviesTable.getIndicesOf('name', 'Apollo 13') ).toEqual( [2] );
+    // console.log(moviesTable.indexTable);
+    expect( moviesTable.getIndex('name', 'Apollo 13') ).toEqual( [2] );
   });
 
 
@@ -303,26 +305,26 @@ describe('Functional Query Language - Indexing', function () {
   it('should support indexing a value that exists in multiple rows', function() {
     
     actorsTable.addIndex('last_name');
-    expect( actorsTable.getIndicesOf('last_name', 'Allison') ).toEqual( [14, 15, 16] );
+    expect( actorsTable.getIndex('last_name', 'Allison') ).toEqual( [14, 15, 16] );
   });
 
 
-  /**
-   * Indices are only useful because they allow you to retrieve data 
-   * faster than naive searching.
-   *
-   * Once a field is indexed, where queries on that field should make
-   * use of that index. Instead of naively searching through all data, 
-   * the where should simply reach into the indices and pluck those 
-   * out of the data.
-   */
+  // /**
+  //  * Indices are only useful because they allow you to retrieve data 
+  //  * faster than naive searching.
+  //  *
+  //  * Once a field is indexed, where queries on that field should make
+  //  * use of that index. Instead of naively searching through all data, 
+  //  * the where should simply reach into the indices and pluck those 
+  //  * out of the data.
+  //  */
   it('should use available indices during where queries', function() {
     actorsTable.addIndex('last_name');
 
-    spyOn(actorsTable, 'getIndicesOf').andCallThrough();
+    spyOn(actorsTable, 'getIndex').andCallThrough();
     var results = actorsTable.where({last_name: "Russell"}).exec();
     expect( results.length ).toEqual( 4 );
-    expect( actorsTable.getIndicesOf ).toHaveBeenCalledWith( 'last_name', 'Russell' );
+    expect( actorsTable.getIndex ).toHaveBeenCalledWith( 'last_name', 'Russell' );
   });
 
   it('should produce the same query results with significantly faster look up times', function() {

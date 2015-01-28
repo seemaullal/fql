@@ -19,6 +19,7 @@ function merge(obj1, obj2) {
 
 function FQL(table) {
 	this.table = table;
+	this.indexTable = { };
 
 };
 
@@ -91,13 +92,32 @@ FQL.prototype.order = function (columnName) {
 	sortedTable.sort(function(obj1,obj2) {
 		return obj1[columnName] - obj2[columnName];
 	});
-
 	return new FQL(sortedTable);
+};
+
+FQL.prototype.left_join = function(foriegnFql, rowMatcher) {
 
 };
 
-FQL.prototype.left_join = function (foriegnFql, rowMatcher) {};
+FQL.prototype.addIndex = function(columnName) {
+	var indexTable = { };
+	var curr_tab = this.exec();
+	for (var i=0, len= curr_tab.length; i<len; i++) {
+		if (curr_tab[i].hasOwnProperty(columnName)) {
+			if(indexTable[curr_tab[i][columnName]]) {
+				indexTable[curr_tab[i][columnName]].push(i);
+			}
+			else {
+				indexTable[curr_tab[i][columnName]] = [ i ];
+			}
+		}
+	}
+	this.indexTable[columnName] = indexTable;
+};
 
-FQL.prototype.addIndex = function (columnName) {};
+FQL.prototype.getIndex = function(columnName, val) {
+	if (!this.indexTable[columnName])
+		return undefined;
+	return this.indexTable[columnName][val];
+};
 
-FQL.prototype.getInidicesOf = function (columnName, val) {};
