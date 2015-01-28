@@ -29,15 +29,31 @@ FQL.prototype.exec = function () {
 
 FQL.prototype.where = function (filters) {
 	var results = [ ];
-	if ( (Object.keys(filters).length ===1) && ( this.indexTable [Object.keys(filters)[0]] != undefined) ) {
-		for (key in filters) {
-			var col = key;
-			var val = filters[key];
+	var hasIndex = false;
+	for (atr in filters) {
+		if (this.getIndex(atr,filters[atr]) != undefined ) {
+			hasIndex = true;
+			var indices = this.getIndex(atr,filters[atr]);
+			break;
 		}
-		var indices = this.getIndex(col,val);
+	}
+	if (hasIndex) {
 		for (var i=0; i<indices.length; i++) {
-			results.push(this.table[indices[i]]);
-		}
+			var isMatch = true;
+		 	var curr = this.table[indices[i]];
+			for (atr in filters) {
+				if (typeof filters[atr] === "function") {
+					if (!filters[atr](this.table[indices[i]][atr]))
+						isMatch=false;
+				}
+				else if (this.table[indices[i]][atr] !== filters[atr]) {
+					isMatch = false;
+				}
+			}
+			if (isMatch) {
+				results.push(this.table[indices[i]]);
+			}
+	}
 	}
 	else {
 		for (var i=0, len= this.table.length; i<len; i++) {
@@ -107,7 +123,22 @@ FQL.prototype.order = function (columnName) {
 	return new FQL(sortedTable);
 };
 
-FQL.prototype.left_join = function(foriegnFql, rowMatcher) {
+FQL.prototype.left_join = function(foreignFql, rowMatcher) {
+	var currTable = this.exec();
+	var results = [ ];
+	var foreignTable = foreignFql.exec();
+	for (var i=0; i < currTable.length; i++) {
+		//results.push(currTable[i]);
+		for (var j=0; j < foreignTable.length; j++) {
+			if (rowMatcher(currTable[i],foreignTable[j])) {
+				// if (!results.find(foreignTable[j]))
+					results.push(merge(currTable[i],foreignTable[j]));
+			}
+		}
+	}
+	return new FQL(results);
+
+
 
 };
 
